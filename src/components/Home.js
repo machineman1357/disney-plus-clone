@@ -8,6 +8,7 @@ function Home() {
         <div>
             <Container>
                 <ImageSlider />
+                <Viewers />
             </Container>
         </div>
     );
