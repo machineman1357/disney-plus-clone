@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import ImageSlider from "./ImageSlider.js";
 import Viewers from "./Viewers.js";
+import Movies from "./Movies.js";
 
 function Home() {
     return (
@@ -9,6 +10,7 @@ function Home() {
             <Container>
                 <ImageSlider />
                 <Viewers />
+                <Movies />
             </Container>
         </div>
     );
