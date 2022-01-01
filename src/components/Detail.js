@@ -1,43 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import db from "../firebase.js";
 
 function Detail() {
+    const { id } = useParams();
+    const [movie, setMovie] = useState();
+
+    useEffect(() => {
+        // Grab the movie info from DB
+        db.collection("movies")
+            .doc(id)
+            .get()
+            .then((doc) => {
+                if (doc.exists) {
+                    // save the movie data
+                    setMovie(doc.data());
+                } else {
+                    // redirect to home page
+                }
+            });
+    }, [id]);
+
     return (
         <Container>
-            <Background>
-                <img
-                    src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg"
-                    alt=""
-                ></img>
-            </Background>
-            <ImageTitle>
-                <img
-                    src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78"
-                    alt=""
-                ></img>
-            </ImageTitle>
-            <Controls>
-                <PlayButton>
-                    <img src="/images/play-icon-black.png" alt=""></img>
-                    <span>PLAY</span>
-                </PlayButton>
-                <TrailerButton>
-                    <img src="/images/play-icon-white.png" alt=""></img>
-                    <span>Trailer</span>
-                </TrailerButton>
-                <AddButton>
-                    <span>+</span>
-                </AddButton>
-                <GroupWatchButton>
-                    <img src="/images/group-icon.png" alt=""></img>
-                </GroupWatchButton>
-            </Controls>
-            <Subtitle>
-                2018 - 7m - Family, Fant
-            </Subtitle>
-            <Description>
-                A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...A Chinese mom who's sad...
-            </Description>
+            {movie && (
+                <>
+                    <Background>
+                        <img src={movie.backgroundImg} alt=""></img>
+                    </Background>
+                    <ImageTitle>
+                        <img src={movie.titleImg} alt=""></img>
+                    </ImageTitle>
+                    <Controls>
+                        <PlayButton>
+                            <img src="/images/play-icon-black.png" alt=""></img>
+                            <span>PLAY</span>
+                            <BorderFlair className="border-flair" />
+                        </PlayButton>
+                        <TrailerButton>
+                            <img src="/images/play-icon-white.png" alt=""></img>
+                            <span>Trailer</span>
+                            <BorderFlair className="border-flair" />
+                        </TrailerButton>
+                        <AddButton>
+                            <span>+</span>
+                        </AddButton>
+                        <GroupWatchButton>
+                            <img src="/images/group-icon.png" alt=""></img>
+                        </GroupWatchButton>
+                    </Controls>
+                    <Subtitle>{movie.subTitle}</Subtitle>
+                    <Description>{movie.description}</Description>
+                </>
+            )}
         </Container>
     );
 }
@@ -98,9 +114,26 @@ const PlayButton = styled.button`
     letter-spacing: 1.8px;
     cursor: pointer;
     box-shadow: 0 1px 1px #0c0d0e47, inset 0 1px 3px 0px #0c0d0e66;
+    position: relative;
 
     &:hover {
-        background: rgb(198, 198, 198);
+        animation: expandThenReturn 150ms;
+
+        .border-flair {
+            display: block;
+            animation: edgeShadowInOut 250ms;
+        }
+    }
+
+    @keyframes expandThenReturn {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes edgeShadowInOut {
+        0% { box-shadow: 0 0 12px 3px white; }
+        100% { box-shadow: 0 0 12px 3px #ffffff00; }
     }
 `;
 
@@ -109,6 +142,22 @@ const TrailerButton = styled(PlayButton)`
     border: 1px solid rgb(249, 249, 249);
     color: rgb(249, 249, 249);
     text-transform: uppercase;
+    transition: 150ms;
+
+    &:hover {
+        background: rgb(198, 198, 198);
+    }
+`;
+
+const BorderFlair = styled.div`
+    width: calc(100% + 16px);
+    height: calc(100% + 16px);
+    left: -8px;
+    position: absolute;
+    border: 3px solid white;
+    border-radius: 8px;
+    pointer-events: none;
+    display: none;
 `;
 
 const AddButton = styled.button`
@@ -122,6 +171,7 @@ const AddButton = styled.button`
     background: rgba(0, 0, 0, 0.6);
     border: 2px solid white;
     cursor: pointer;
+    min-width: 44px;
 
     &:hover {
         background: rgb(198, 198, 198);

@@ -1,20 +1,79 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { auth, provider } from "../firebase";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import NavButton from "./NavButton.js";
+import {
+    selectUserName,
+    selectUserPhoto,
+    setSignOut,
+    setUserLogin,
+} from "../features/user/userSlice.js";
+import { useSelector, useDispatch } from "react-redux";
 
 function Header() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const userName = useSelector(selectUserName);
+    const userPhoto = useSelector(selectUserPhoto);
+
+    useEffect(() => {
+        auth.onAuthStateChanged(async (user) => {
+            if(user) {
+                dispatch(setUserLogin({
+                    name: user.displayName,
+                    email: user.email,
+                    photo: user.photoURL
+                }));
+                navigate("/home");
+            }
+        });
+    }, []);
+
+    const signIn = () => {
+        auth.signInWithPopup(provider)
+        .then((result) => {
+            let user = result.user;
+            dispatch(setUserLogin({
+                name: user.displayName,
+                email: user.email,
+                photo: user.photoURL
+            }));
+            navigate("/home");
+        });
+    };
+
+    const signOut = () => {
+        auth.signOut()
+        .then(() => {
+            dispatch(setSignOut());
+            navigate("/login");
+        });
+    };
+
     return (
         <Nav>
             <Logo src="/images/logo.svg" />
-            <NavMenu>
-                <NavButton src="/images/home-icon.svg" alt="home icon" text="HOME" />
-                <NavButton src="/images/search-icon.svg" alt="search icon" text="SEARCH" />
-                <NavButton src="/images/watchlist-icon.svg" alt="watchlist icon" text="WATCHLIST" />
-                <NavButton src="/images/original-icon.svg" alt="original icon" text="ORIGINAL" />
-                <NavButton src="/images/movie-icon.svg" alt="movies icon" text="MOVIES" />
-                <NavButton src="/images/series-icon.svg" alt="series icon" text="SERIES" />
-            </NavMenu>
-            <UserImg src="https://cdn.xxl.thumbs.canstockphoto.com/beautiful-young-woman-holding-the-hair-with-flirting-sexy-look-beautiful-young-woman-holding-the-stock-photos_csp11609138.jpg"/>
+            { !userName ? (
+                <LoginContainer>
+                    <Login onClick={signIn}>Login</Login>
+                </LoginContainer>
+                ):
+                <>
+                    <NavMenu>
+                        <NavButton src="/images/home-icon.svg" alt="home icon" text="HOME" />
+                        <NavButton src="/images/search-icon.svg" alt="search icon" text="SEARCH" />
+                        <NavButton src="/images/watchlist-icon.svg" alt="watchlist icon" text="WATCHLIST" />
+                        <NavButton src="/images/original-icon.svg" alt="original icon" text="ORIGINAL" />
+                        <NavButton src="/images/movie-icon.svg" alt="movies icon" text="MOVIES" />
+                        <NavButton src="/images/series-icon.svg" alt="series icon" text="SERIES" />
+                    </NavMenu>
+                    <UserImg
+                        onClick={signOut}
+                        src={userPhoto}
+                    />
+                </>
+            }
         </Nav>
     );
 }
@@ -89,4 +148,27 @@ const UserImg = styled.img`
     &:hover {
         transform: scale(1.1);
     }
+`;
+
+const Login = styled.div`
+    border-radius: 4px;
+    border: 1px solid #f9f9f9;
+    padding: 8px 16px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: rgba(0, 0, 0, 0.6);
+    transition: all 0.2s ease 0s;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #f9f9f9;
+        color: black;
+        border-color: transparent;
+    }
+`;
+
+const LoginContainer = styled.div`
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
 `;
