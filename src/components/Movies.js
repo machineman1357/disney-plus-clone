@@ -6,12 +6,11 @@ import { useSelector } from "react-redux";
 
 export default function Movies() {
     const movies = useSelector(selectMovies);
-    console.log("this is movies", movies);
 
     return (
         <Container>
             <h4>Recommended for You</h4>
-            <Content>
+            <Content className="movies">
                 {movies &&
                     movies.map((movie) => (
                         <Wrap key={movie.id}>

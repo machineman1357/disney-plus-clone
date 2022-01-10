@@ -32,7 +32,7 @@ function Detail() {
                     <ImageTitle>
                         <img src={movie.titleImg} alt=""></img>
                     </ImageTitle>
-                    <Controls>
+                    <Controls className="controls">
                         <PlayButton>
                             <img src="/images/play-icon-black.png" alt=""></img>
                             <span>PLAY</span>
@@ -99,6 +99,7 @@ const ImageTitle = styled.div`
 const Controls = styled.div`
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 `;
 
 const PlayButton = styled.button`

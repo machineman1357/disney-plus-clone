@@ -52,7 +52,7 @@ function Header() {
     };
 
     return (
-        <Nav>
+        <Nav className="nav">
             <Logo src="/images/logo.svg" />
             { !userName ? (
                 <LoginContainer>

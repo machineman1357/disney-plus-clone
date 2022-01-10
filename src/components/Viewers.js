@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 export default function Viewers() {
     return (
-        <Container>
+        <Container className='viewers'>
             <Wrap>
                 <img src="/images/viewers-disney.png" alt=""></img>
             </Wrap>
